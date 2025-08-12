@@ -8,6 +8,12 @@ services:
       - ~/.pg/pg_data/yt:/var/lib/postgresql/data
     env_file:
       - .env 
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
   stripe_service:
     build: .  
     image: yt_docker:latest
@@ -22,6 +28,8 @@ services:
       - .env
     command: >
       bash -c "./manage.py collectstatic --noinput && ./manage.py migrate && gunicorn -b 0.0.0.0:8000 Stripe.wsgi:application"
+    restart: always
+    
   nginx:
     build:
       dockerfile: ./Dockerfile
