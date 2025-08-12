@@ -1,0 +1,23 @@
+{% load static %}
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>{{ item.name }}</title>
+  <script src="https://js.stripe.com/v3/"></script>
+  <script src="{% static 'js/payment.js' %}"></script>
+</head>
+<body>
+  <h1>{{ item.name }}</h1>
+  <p>{{ item.description }}</p>
+  <p>Цена: {{ item.price }} копеек/центов</p>
+
+  <div id="card-element"></div>
+  <button id="buy-button">Buy</button>
+  <div id="payment-message"></div>
+
+  <script>
+    initStripePayment('/buy/{{ item.id }}/', '{{ stripe_publishable_key }}');
+  </script>
+</body>
+</html>

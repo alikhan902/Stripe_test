@@ -1,0 +1,41 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:17
+    container_name: yt_postgres
+    volumes:
+      - ~/.pg/pg_data/yt:/var/lib/postgresql/data
+    env_file:
+      - .env 
+  stripe_service:
+    build: .  
+    image: yt_docker:latest
+    container_name: yt_docker
+    depends_on:
+      - db
+    ports:
+      - "8000:8000"
+    volumes:
+      - static_volume:/yt/staticfiles
+    env_file:
+      - .env
+    command: >
+      bash -c "./manage.py collectstatic --noinput && ./manage.py migrate && gunicorn -b 0.0.0.0:8000 Stripe.wsgi:application"
+  nginx:
+    build:
+      dockerfile: ./Dockerfile
+      context: ./docker/nginx/
+    container_name: yt_nginx
+    image: yt_nginx
+    volumes:
+      - static_volume:/yt/staticfiles
+    depends_on:
+      - stripe_service
+    ports:
+      - "${NGINX_EXTERNAL_PORT}:80"
+
+volumes:
+  static_volume:
+
+    
