@@ -23,6 +23,8 @@ RUN dos2unix /yt/manage.py && chmod +x /yt/manage.py
 
 RUN pip install -r requirements.txt
 
+RUN python manage.py collectstatic --noinput
+
 USER yt
 
 CMD ["gunicorn", "-b", "0.0.0.0:8000", "Stripe.wsgi:application"]
